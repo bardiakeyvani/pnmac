@@ -9,10 +9,10 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 var skipWeatherRowsRegex = regexp.MustCompile("<pre>|</pre>|MMU|Dy|mo")
+var tableRowRegex = regexp.MustCompile(`\s+(\d+)\s+(\d+)\*?\s+(\d+)\*?\s+(\d+)\s+(\d+)?\s+(\d+\.\d)\s+(\d+\.\d{2})\s+([A-Z]+)?\s+(\d{3})\s+(\d+\.\d{1})\s(\d{3})\s+(\d+)\*?\s+(\d+.\d)\s+(\d+)\s+(\d+)\s+(\d+.\d)$`)
 
 func main() {
 
@@ -43,7 +43,7 @@ func processWeatherTable(tablePath string) {
 }
 
 func getRowWithSmallestTemperatureSpread(rows [][]string) ([]string, error) {
-	if len(rows) == 0 || len(rows[0]) != 18 {
+	if len(rows) == 0 || len(rows[0]) != 16 {
 		return nil, errors.New("not a valid table")
 	}
 	smallestSpread := 0
@@ -107,26 +107,27 @@ func readWeatherTable(fileName string) ([][]string, error) {
 
 func getWeatherRowColumns(row string) []string {
 	// remove all *
-	row = strings.ReplaceAll(row, "*", " ")
+	columns := tableRowRegex.FindAllStringSubmatch(row, -1)
+	if len(columns) != 1 && len(columns[0]) != 17 {
+		log.Fatalf("not a valid row. count: %d", len(columns[0]))
+	}
 	return []string{
-		strings.Replace(row[0:4], " ", "", -1),
-		strings.Replace(row[5:10], " ", "", -1),
-		strings.Replace(row[12:17], " ", "", -1),
-		strings.Replace(row[17:22], " ", "", -1),
-		strings.Replace(row[23:29], " ", "", -1),
-		strings.Replace(row[30:35], " ", "", -1),
-		strings.Replace(row[35:40], " ", "", -1),
-		strings.Replace(row[41:46], " ", "", -1),
-		strings.Replace(row[47:53], " ", "", -1),
-		strings.Replace(row[47:53], " ", "", -1),
-		strings.Replace(row[54:58], " ", "", -1),
-		strings.Replace(row[59:63], " ", "", -1),
-		strings.Replace(row[64:67], " ", "", -1),
-		strings.Replace(row[68:71], " ", "", -1),
-		strings.Replace(row[72:76], " ", "", -1),
-		strings.Replace(row[76:80], " ", "", -1),
-		strings.Replace(row[80:83], " ", "", -1),
-		strings.Replace(row[83:], " ", "", -1),
+		columns[0][1],
+		columns[0][2],
+		columns[0][3],
+		columns[0][4],
+		columns[0][5],
+		columns[0][6],
+		columns[0][7],
+		columns[0][8],
+		columns[0][9],
+		columns[0][10],
+		columns[0][11],
+		columns[0][12],
+		columns[0][13],
+		columns[0][14],
+		columns[0][15],
+		columns[0][16],
 	}
 
 }
