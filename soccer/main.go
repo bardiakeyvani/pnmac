@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +13,33 @@ import (
 )
 
 var skipSoccerRowsRegex = regexp.MustCompile("<pre>|</pre>|Team|--")
+
+func main() {
+
+	tablePath := flag.String("table", "", "path to where table file is located")
+
+	flag.Parse()
+
+	if len(*tablePath) == 0 {
+		fmt.Print("please provide comple path to table file. example: ./tables/w_data.dat")
+		return
+	}
+	processSoccerTable(*tablePath)
+}
+
+func processSoccerTable(filepath string) {
+	rows, err := readSoccerTable(filepath)
+	if err != nil {
+		log.Fatalf("Failed to read soccer table. error: %s", err.Error())
+	}
+
+	teamWithSmallestScoreDifference, err := findTeamWithSmallestScoreDifference(rows)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	fmt.Println("Team with smallest goal difference is: ", teamWithSmallestScoreDifference[1])
+}
 
 func readSoccerTable(fileName string) ([][]string, error) {
 	// open file

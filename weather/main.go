@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +13,34 @@ import (
 )
 
 var skipWeatherRowsRegex = regexp.MustCompile("<pre>|</pre>|MMU|Dy|mo")
+
+func main() {
+
+	tablePath := flag.String("table", "", "path to where table file is located")
+
+	flag.Parse()
+
+	if len(*tablePath) == 0 {
+		fmt.Print("please provide comple path to table file. example: ./tables/w_data.dat")
+		return
+	}
+
+	processWeatherTable(*tablePath)
+
+}
+
+func processWeatherTable(tablePath string) {
+	rows, err := readWeatherTable(tablePath)
+	if err != nil {
+		log.Fatalf("Failed to read weather table. error: %s", err.Error())
+	}
+
+	dayWithSmallestSpread, err := getRowWithSmallestTemperatureSpread(rows)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	fmt.Println("smallest temperature spread is on day: ", dayWithSmallestSpread[0])
+}
 
 func getRowWithSmallestTemperatureSpread(rows [][]string) ([]string, error) {
 	if len(rows) == 0 || len(rows[0]) != 18 {

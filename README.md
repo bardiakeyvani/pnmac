@@ -3,7 +3,6 @@
 2. Read soccers table and returns the name of the team with smallest For and Against score
 
 ## required argument
-- type: --weather or --soccer
 - table: path to table file. Example: --table=./tables/soccer.dat
 
 # How to run
@@ -11,16 +10,20 @@ You can run the included binary on any macOS operating system. You can also buil
 ## Using binary 
 
 ```
-./bin/pnmac --soccer --table=./tables/soccer.dat
+./bin/soccer --table=./tables/soccer.dat
 
-./bin/pnmac --weather --table=./tables/w_data.dat 
+./bin/weather --table=./tables/w_data.dat 
 ```
 
 ## build from source
 ```
 git clone git@github.com:bardiakeyvani/pnmac.git
-cd pnmac
-go build -o pnmac 
-pnmac --weather --table=./tables/w_data.dat
-pnmac --soccer --table=./tables/soccer.dat
+cd pnmac/weather
+go build -o weather 
+./weather --table=../tables/w_data.dat
+
+cd ..
+cd soccer
+go build -o soccer
+./soccer --table=../tables/soccer.dat
 ```
